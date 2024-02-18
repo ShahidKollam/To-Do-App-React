@@ -55,6 +55,15 @@ li {
     padding-left: 5px;
     font-size: 25px;
 }
+.error {
+    color: rgb(255, 0, 0);
+    margin-top: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    padding-left: 20px; /* Adjust the padding-left as needed */
+
+}
+  
 #complete{
     color: greenyellow;
 }

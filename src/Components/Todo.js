@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./Todo.css";
-import { useState, useRef, useEffect } from "react";
 import { MdDeleteForever } from "react-icons/md";
 import { IoCheckmarkDoneCircleOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
@@ -9,34 +8,42 @@ const Todo = () => {
   const [todo, setTodo] = useState("");
   const [todos, setTodos] = useState([]);
   const [editId, setEditId] = useState(0);
+  const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
   };
- 
+
   const addTodo = () => {
-    if (todo !== "") {
-      setTodos([...todos, { list: todo, id: Date.now(), status: false }]);
-      console.log(todos);
-      setTodo("");
-    } 
+    if (!todo.trim()) {
+      setError("Please enter a todo item");
+      return;
+    }
+
+    const isDuplicate = todos.some((item) => item.list === todo);
+    if (isDuplicate) {
+      setError("Todo item already exists");
+      return;
+    }
+
     if (editId) {
       const editTodo = todos.find((todo) => todo.id === editId);
-      const updateTodo = todos.map((to) =>
-        to.id === editTodo.id
-          ? (to = { id: to.id, list: todo })
-          : (to = { id: to.id, list: to.list })
+      const updatedTodos = todos.map((to) =>
+        to.id === editTodo.id ? { ...to, list: todo } : to
       );
-      setTodos(updateTodo);
+      setTodos(updatedTodos);
       setEditId(0);
-      setTodo("");
+    } else {
+      setTodos([...todos, { list: todo, id: Date.now(), status: false }]);
     }
+    setTodo("");
+    setError("");
   };
 
-  const inputRef = useRef("null");
+  const inputRef = useRef(null);
   useEffect(() => {
     inputRef.current.focus();
-  });
+  }, []);
 
   const onDelete = (id) => {
     setTodos(todos.filter((to) => to.id !== id));
@@ -75,6 +82,7 @@ const Todo = () => {
           {editId ? "EDIT" : "ADD"}
         </button>
       </form>
+      {error && <div className="error">{error}</div>}
       <div className="list">
         <ul>
           {todos.map((to) => (
